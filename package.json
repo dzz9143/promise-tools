@@ -1,6 +1,6 @@
 {
   "name": "@dzz9143/promise-tools",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -38,7 +38,6 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "debug": "^4.1.1",
-    "lodash": "^4.17.15"
+    "debug": "^4.1.1"
   }
 }
