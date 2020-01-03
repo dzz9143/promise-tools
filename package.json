@@ -1,0 +1,44 @@
+{
+  "name": "@dzz9143/promise-tools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run build-ts",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "lint": "eslint **/*.ts --fix",
+    "test": "jest --forceExit --coverage --verbose",
+    "watch-test": "npm run test -- --watch",
+    "preversion": "npm run lint && npm test",
+    "version": "npm run build && git add -A lib",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dzz9143/promise-tools.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dzz9143/promise-tools/issues"
+  },
+  "homepage": "https://github.com/dzz9143/promise-tools#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.6",
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "^2.3.1",
+    "concurrently": "^4.1.2",
+    "eslint": "^6.4.0",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.3"
+  },
+  "dependencies": {
+    "debug": "^4.1.1",
+    "lodash": "^4.17.15"
+  }
+}
