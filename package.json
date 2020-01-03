@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "files": [
+    "lib",
+    "index.js",
+    "readme.MD"
+  ],
   "scripts": {
     "build": "npm run build-ts",
     "build-ts": "tsc",
