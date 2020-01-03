@@ -1,9 +1,9 @@
 import np from "./np";
-import queue from "./parallel";
+import parallel from "./parallel";
 import sleep from "./sleep";
 
 export default {
     np,
-    queue,
+    parallel,
     sleep,
 };
