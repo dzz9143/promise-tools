@@ -12,7 +12,7 @@ export default function queue(arrOfFns: any, options: QueueOptions) {
     let finished = 0;
     let failed = 0;
     let running = 0;
-    let len = arrOfFns.length;
+    const len = arrOfFns.length;
     return new Promise((resolve) => {
         const nextBatch = () => {
             while (running < options.concurrency && idx < len) {
@@ -32,7 +32,7 @@ export default function queue(arrOfFns: any, options: QueueOptions) {
             if(finished + failed === len) {
                 return resolve();
             }
-        }
+        };
         nextBatch();
     });
 }

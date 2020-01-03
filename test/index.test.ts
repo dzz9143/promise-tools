@@ -1,7 +1,6 @@
-import { getMessage } from '../src/index';
 
-describe('getMessage', () => {
-    it('should return hello + name', () => {
-        expect(getMessage('ts')).toEqual('hello ts');
+describe("dump test", () => {
+    it("should 1 equals 1", () => {
+        expect(1).toEqual(1);
     });
 });
