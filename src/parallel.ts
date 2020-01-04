@@ -6,6 +6,11 @@ interface ParallelOptions {
     onError?: any;
 }
 
+interface ParallelResult {
+    finished: number;
+    failed: number;
+}
+
 type AsyncFunction = () => Promise<any>;
 
 const defaults: ParallelOptions = {
@@ -14,7 +19,7 @@ const defaults: ParallelOptions = {
     onError: constant,
 };
 
-export default function parallel(fns: AsyncFunction[], options: ParallelOptions) {
+export default function parallel(fns: AsyncFunction[], options: ParallelOptions): Promise<ParallelResult> {
     let idx = 0;
     let finished = 0;
     let failed = 0;
