@@ -1,5 +1,3 @@
-// a queue to run async function sequentially and concurrently
-// an easy way to process a lot of async functions with control of concurrency
 import { constant, noop } from './utils';
 
 interface ParallelOptions {

@@ -2,19 +2,21 @@
 A set of helper and high order functions to simplify the use of promise and async function.
 
 It contains:
-1. np - normalize the return of promise and avoid try_catch block
-2. sleep - a promise version of setTimeout, used to delay operation
-3. parallel - a promise.all with a concurrent limit and a set of hooks
+1. `np` - normalize the return of promise and avoid try_catch block
+2. `sleep` - a promise version of setTimeout, used to delay operation
+3. `parallel` - run a collection of async function in parallel with fine control over concurrency
 
 
-## np
-`np` stands for `normalize promise` which is a function that receives a promise and return a normalized promise
+## np(promise): Promise&lt;NormalizedResult&gt;
+* `promise` - [Promise] a promise or promise like(thenable)
+* `NormalizedResult` - [Array] a normalized result which is a two elements array `[reason: any, data: T]`
+    * `reason` - [any] first element of array is the possible rejected value
+    * `data` - [T] second element of array is the possible resolved value
+* Returns: Promise&lt;NormalizedResult&gt;
 
-It will handle the error `automatically` and normalize the resolved value.
+np let you handle promise error in a clean way, which results in a more readable code.
 
-When in async function, instead of handling promise in a `try catch` block, you can handle the possible error and data in a much more straight forward way, check the code sample below
-
-`Without np`, when you await a promise, you will probably handle the promise error like this:
+Instead of using `try_catch` block: 
 ```javascript
 async function do() {
     try {
@@ -27,7 +29,7 @@ async function do() {
 }
 ```
 
-`With np`, you can do it like this:
+You can do it like this:
 ```javascript
 async function do() {
     const [err, data] = await np(aPromise);
@@ -39,10 +41,34 @@ async function do() {
 }
 ```
 
-As you can see, you can get more control over error handling without messing your code
 
+## parallel (asyncFnArray[, options]): Promise&lt;ParallelResult&gt;
+* `asyncFnArray` - [Array] collection of async functions to run
+* `options` - [Object]
+    * `concurrency` - [Number] specifies concurrency limit, default to 10
+    * `onSuccess` - [Function] optional, callback function to run after each async function resolve
+    * `onError` - [Function], optional, callback function to run after each async function reject
+* `ParallelResult`:
+    * `finished` - [Number] number of finished resolved async function
+    * `failed` - [Number] number of failed rejected async function
+* Returns: Promise&lt;ParallelResult&gt;
 
-## sleep
+Run a set of async functions in parallel with fine control over concurrency limit and reject/resolve hook.
+
+example:
+```javascript
+
+parallel([asyncFn1, asyncFn2, asyncFn3], {
+    concurrency: 2,
+}).then(res => {
+    console.log(res)    // { finsihed: 3,  failed: 0 }
+});
+
+```
+
+## sleep(ms):Promise&lt;void&gt;
+* ms - [Number] number of millisecond to sleep
+
 `sleep` is a promisified setTimeout which can be used to delay some operations
 
 ```javascript
