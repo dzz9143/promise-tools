@@ -1,4 +1,4 @@
-import { constant, noop } from './utils';
+import { constant } from "./utils";
 
 interface ParallelOptions {
     concurrency?: number;
@@ -37,7 +37,7 @@ export default function parallel(fns: AsyncFunction[], options: ParallelOptions)
             }
 
             while (running < opts.concurrency && idx < len) {
-                running++
+                running++;
                 const fn = fns[idx++];
                 fn().then(data => {
                     finished++;
@@ -45,7 +45,7 @@ export default function parallel(fns: AsyncFunction[], options: ParallelOptions)
                 }, err => {
                     failed++;
                     return opts.onError.call(null, err);
-                }).catch(noop /* swallow the possible error to avoid affect other running task*/).finally(() => {
+                }).catch(constant /* swallow the possible error to avoid affect other running task*/).finally(() => {
                     running--;
                     nextBatch();
                 });
