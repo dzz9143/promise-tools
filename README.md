@@ -4,7 +4,9 @@ A set of helper and high order functions to simplify the use of promise and asyn
 It contains:
 1. `np` - normalize the return of promise and avoid try_catch block
 2. `sleep` - a promise version of setTimeout, used to delay operation
-3. `parallel` - run a collection of async function in parallel with fine control over concurrency
+3. `parallel` - run a collection of async function in parallel with fine
+ control over concurrency
+4. `withCache` - a high order function which implements `promise cache` pattern, 
 
 
 ## np(promise): Promise&lt;NormalizedResult&gt;
@@ -78,3 +80,8 @@ async function do() {
     // do something after 2000ms
 }
 ```
+
+## withCache(asyncFn): decoratedAsyncFn
+* `asyncFn` - async function to passed in
+* Return: `decoratedAsyncFn`
+* `decoratedAsyncFn` - the decorated function which implements `promise cache` pattern
