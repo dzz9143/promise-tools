@@ -2,7 +2,7 @@
   "name": "@dzz9143/promise-tools",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "types": "lib",
   "files": [
     "lib",
     "index.js",
