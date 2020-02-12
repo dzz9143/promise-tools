@@ -12,5 +12,5 @@ export default function withCache<T>(asyncFn: AsyncFunction<T>) {
             cache = null;
         });
         return cache;
-    }
+    };
 }
