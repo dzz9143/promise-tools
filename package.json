@@ -1,7 +1,7 @@
 {
   "name": "@dzz9143/promise-tools",
   "version": "0.2.1",
-  "description": "",
+  "description": "a set of promise utils & high order functions",
   "main": "lib",
   "files": [
     "lib",
@@ -23,7 +23,12 @@
     "type": "git",
     "url": "git+https://github.com/dzz9143/promise-tools.git"
   },
-  "keywords": [],
+  "keywords": [
+    "typescript",
+    "promise",
+    "utils",
+    "tools"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
