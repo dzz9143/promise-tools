@@ -62,7 +62,7 @@ describe("withRetry should", ()=> {
         try {
             await f();
         } catch (err) {
-            expect(err.name).toEqual("RetryFailed");
+            expect(err.name).toEqual("RetryLimitExceedError");
             expect(func.mock.calls.length).toEqual(2);
         }
     });
@@ -73,23 +73,6 @@ describe("withRetry should", ()=> {
             .mockResolvedValueOnce(20)
             .mockResolvedValueOnce(40)
             .mockResolvedValueOnce(100);
-
-        const predict = (err: any, data: number) => {
-            // retry if returned value less than 50
-            return data < 50;
-        };
-        const f = withRetry(func, predict);
-        const result = await f();
-        expect(result).toEqual(100);
-        expect(func.mock.calls.length).toEqual(4);
-    });
-
-    it("be able to work with sync function", async () => {
-        const func = jest.fn();
-        func.mockReturnValueOnce(10)
-            .mockReturnValueOnce(20)
-            .mockReturnValueOnce(40)
-            .mockReturnValueOnce(100);
 
         const predict = (err: any, data: number) => {
             // retry if returned value less than 50

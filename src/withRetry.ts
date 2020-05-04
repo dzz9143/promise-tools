@@ -1,12 +1,9 @@
+import { createError } from "./utils";
+import { AsyncFunction, ResolveType } from "./types";
+
 export type RetryOptions = {
     timeout?: number;
     limit?: number;
-}
-
-function createError(name: string, message: string): Error {
-    const err = new Error(message);
-    err.name = name;
-    return err;
 }
 
 const defaultOptions = {
@@ -14,11 +11,11 @@ const defaultOptions = {
     limit: 10,
 };
 
-function withRetry<T extends (...args: any[]) => any>(
+function withRetry<T extends AsyncFunction>(
     func: T,
-    predicate: (err: any, data: ReturnType<T> extends Promise<infer U> ? U : ReturnType<T>) => boolean,
+    predicate: (err: any, data: ResolveType<T>) => boolean,
     opts: RetryOptions = {},
-): (...funcArgs: Parameters<T>) => ReturnType<T> extends Promise<infer U> ? Promise<U> : Promise<ReturnType<T>> {
+): (...funcArgs: Parameters<T>) => Promise<ResolveType<T>> {
     const options = Object.assign({}, defaultOptions, opts);
 
     if (isNaN(options.limit) || options.limit <= 0) {
@@ -29,29 +26,30 @@ function withRetry<T extends (...args: any[]) => any>(
         throw createError("InvalidRetryOptions", "withRetry options.timeout must greater than or equal to 0 ms");
     }
 
-    return (...args: Parameters<T>): ReturnType<T> extends Promise<infer U> ? Promise<U> : Promise<ReturnType<T>> => {
-        return new Promise((resolve, reject) => {
+    return (...args: Parameters<T>): Promise<ResolveType<T>> => {
+        return new Promise<ResolveType<T>>((resolve, reject) => {
             const process = (
                 err: any,
-                data: ReturnType<T> extends Promise<infer U> ? U : ReturnType<T>,
+                data: ResolveType<T>,
                 count: number,
                 fire: (count: number) => any,
             ) => {
                 if (predicate(err, data)) {
-                    return count < options.limit ? setTimeout(() => fire(count + 1), options.timeout) : reject(createError("RetryFailed", "fail after retry"));
+                    return count < options.limit
+                        ? setTimeout(() => fire(count + 1), options.timeout)
+                        : reject(createError("RetryLimitExceedError", "fail after retry"));
                 }
                 err ? reject(err) : resolve(data);
             };
 
             const fire = (count: number) => {
-                Promise.resolve()
-                    .then(() => func(...args))
+                func(...args)
                     .then(data => process(null, data, count, fire))
                     .catch(err => process(err, null, count, fire));
             };
 
             fire(0);
-        }) as ReturnType<T> extends Promise<infer U> ? Promise<U> : Promise<ReturnType<T>>;
+        });
     };
 }
 
