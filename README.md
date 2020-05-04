@@ -81,7 +81,43 @@ async function do() {
 }
 ```
 
-## withCache(asyncFn): decoratedAsyncFn
-* `asyncFn` - async function to passed in
-* Return: `decoratedAsyncFn`
-* `decoratedAsyncFn` - the decorated function which implements `promise cache` pattern
+
+## withRetry(func, shouldRetry, retryOptions) => funcWithRetry
+* `func` - [Function] - The original function to run
+* `shouldRetry` - [Function] A predicte function to determine if we want to retry based on the resolve/reject value from asyncFn, for example:
+```javascript
+// example: retry if asyncFn rejects with an error
+// shouldRetry is an error first function, the first argument is the error object
+// will retry if this function return true
+function shouldRetry(err, value) {
+    if(err) {
+        return true;
+    }
+
+    return false;
+}
+```
+* `retryOptions` - [Object] 
+  * limit - [Number] Retry limit, how many times should it retry based on the predicate. Default: 10.
+  * timeout - [Number] Retry timeout in ms, specify 0 to disable timeout. Default: 100ms.
+* `funcWithRetry` - [Function] The decorated function with the ability to auto retry based on predicate, note this function will return a promise
+
+Example:
+```javascript
+import fetch from "node-fetch";
+import withRetry from "../src/withRetry";
+
+const predicate = (err) => {
+    console.warn("fail to fetch:", err.name, err.message);
+    return err && err.code === "ECONNREFUSED";
+};
+
+const fetchWithRetry = withRetry(fetch, predicate, { limit: 3, timeout: 1000 });
+
+fetchWithRetry("http://localhost:3000/api/v1/users")
+    .then(resp => {
+        console.log("resp:", resp);
+    }).catch(err => {
+        console.error("error:", err);
+    });
+```
