@@ -82,8 +82,8 @@ async function do() {
 ```
 
 
-## withRetry(func, shouldRetry, retryOptions) => funcWithRetry
-* `func` - [Function] - The original function to run
+## withRetry(asyncFunc, shouldRetry, retryOptions) => funcWithRetry
+* `asyncFunc` - [Function] - The original async function
 * `shouldRetry` - [Function] A predicte function to determine if we want to retry based on the resolve/reject value from asyncFn, for example:
 ```javascript
 // example: retry if asyncFn rejects with an error
