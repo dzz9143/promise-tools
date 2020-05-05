@@ -43,30 +43,6 @@ async function do() {
 }
 ```
 
-
-## parallel (asyncFnArray[, options]): Promise&lt;ParallelResult&gt;
-* `asyncFnArray` - [Array] collection of async functions to run
-* `options` - [Object]
-    * `concurrency` - [Number] specifies concurrency limit, default to 10
-    * `onSuccess` - [Function] optional, callback function to run after each async function resolve
-    * `onError` - [Function], optional, callback function to run after each async function reject
-* `ParallelResult`:
-    * `finished` - [Number] number of finished resolved async function
-    * `failed` - [Number] number of failed rejected async function
-* Returns: Promise&lt;ParallelResult&gt;
-
-Run a set of async functions in parallel with fine control over concurrency limit and reject/resolve hook.
-
-example:
-```javascript
-
-parallel([asyncFn1, asyncFn2, asyncFn3], {
-    concurrency: 2,
-}).then(res => {
-    console.log(res)    // { finsihed: 3,  failed: 0 }
-});
-```
-
 ## sleep(ms):Promise&lt;void&gt;
 * ms - [Number] number of millisecond to sleep
 
@@ -78,6 +54,39 @@ async function do() {
 
     // do something after 2000ms
 }
+```
+
+## withCache(asyncFunc, getKey, ttl) => asyncFuncWithCache
+A high order function to give an async function ability to cache the returned promise.
+
+Instead of caching the resolved value of promise, this function will cache the whole promise returned by the async function.
+
+### Arguments
+* `asyncFunc` - [Function] The original async function
+* `getKey` - [Function] The function to determine cache key
+* `ttl` - [Number] Time-to-live in millisecond for cache entry
+
+### Return 
+* `asyncFuncWithCache` - [Function] The decorated function with the ability to cache returned promise based on certain strategy
+
+### Example
+```typescript
+import fetch from "node-fetch";
+
+const fetchWithCache = withCache(fetch, (url) => url, 3000);
+
+/**
+ * Instead of firing 1000 requests, this function will only fire one request.
+ * Only the very first function call will trigger the request and the promise returned by the first call will be cached,
+ * Each subsequential call will get the cached promise as long as the cache is not outdated 
+ */
+for(let i = 0; i < 1000; i++) {
+    fetchWitchCache('http://localhost:3000/api/v1/users')
+    .then(resp => {
+        console.log('resp:', resp);
+    });
+}
+
 ```
 
 ## withTimeout(asyncFunc, timeout) => asyncFuncWithTimeout
@@ -108,7 +117,6 @@ fetchWithTimeout("http://localhost:3000/api/v1/users")
 
 ```
 
-
 ## withRetry(asyncFunc, shouldRetry, retryOptions) => asyncFuncWithRetry
 A high order function to give an async function ability to retry based on certain condition.
 
@@ -128,8 +136,8 @@ function shouldRetry(err, value) {
 }
 ```
 * `retryOptions` - [Object] 
-  * limit - [Number] Retry limit, how many times should it retry based on the predicate. Default: 10.
-  * timeout - [Number] Retry timeout in ms, specify 0 to disable timeout. Default: 100ms.
+  * `limit` - [Number] Retry limit, how many times should it retry based on the predicate. Default: 10.
+  * `timeout` - [Number] Retry timeout in ms, specify 0 to disable timeout. Default: 100ms.
 
 ### Return Value
 * `asyncFuncWithRetry` - [Function] The decorated function with the ability to auto retry based on predicate, note this function will return a promise
@@ -153,4 +161,28 @@ fetchWithRetry("http://localhost:3000/api/v1/users")
     }).catch(err => {
         console.error("error:", err);
     });
+```
+
+
+## parallel (asyncFnArray[, options]): Promise&lt;ParallelResult&gt;
+* `asyncFnArray` - [Array] collection of async functions to run
+* `options` - [Object]
+    * `concurrency` - [Number] specifies concurrency limit, default to 10
+    * `onSuccess` - [Function] optional, callback function to run after each async function resolve
+    * `onError` - [Function], optional, callback function to run after each async function reject
+* `ParallelResult`:
+    * `finished` - [Number] number of finished resolved async function
+    * `failed` - [Number] number of failed rejected async function
+* Returns: Promise&lt;ParallelResult&gt;
+
+Run a set of async functions in parallel with fine control over concurrency limit and reject/resolve hook.
+
+example:
+```javascript
+
+parallel([asyncFn1, asyncFn2, asyncFn3], {
+    concurrency: 2,
+}).then(res => {
+    console.log(res)    // { finsihed: 3,  failed: 0 }
+});
 ```
