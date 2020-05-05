@@ -1,16 +1,30 @@
+import { AsyncFunction, ResolveType } from './types';
 
-type AsyncFunction<T> = () => Promise<T>;
+type CacheEntry<T> = {
+    rt: T;
+    createdAt: number;
+};
 
-export default function withCache<T>(asyncFn: AsyncFunction<T>) {
-    let cache: Promise<T>;
-    return async function wrapped(...args: any[]) {
-        if(cache) {
-            return cache;
+function withCache<T extends AsyncFunction>(func: T, getKey: (...args: Parameters<T>) => string, ttl: number) {
+    const _cache = new Map<string, CacheEntry<Promise<ResolveType<T>>>>();
+
+    return (...args: Parameters<T>): Promise<ResolveType<T>> => {
+        const key = getKey(...args);
+        const ent = _cache.get(key);
+
+        if (ent && Date.now() - ent.createdAt <= ttl) {
+            // cache exists and is valid
+            return ent.rt;
         }
 
-        cache = asyncFn().finally(() => {
-            cache = null;
+        const rt = func(...args);
+        _cache.set(key, {
+            rt,
+            createdAt: Date.now(),
         });
-        return cache;
+
+        return rt;
     };
 }
+
+export default withCache;
