@@ -65,7 +65,6 @@ parallel([asyncFn1, asyncFn2, asyncFn3], {
 }).then(res => {
     console.log(res)    // { finsihed: 3,  failed: 0 }
 });
-
 ```
 
 ## sleep(ms):Promise&lt;void&gt;
@@ -81,13 +80,44 @@ async function do() {
 }
 ```
 
+## withTimeout(asyncFunc, timeout) => asyncFuncWithTimeout
+A high order function to give an async function ability to throw an error if execution time exceed certain millisecond.
 
-## withRetry(asyncFunc, shouldRetry, retryOptions) => funcWithRetry
-* `asyncFunc` - [Function] - The original async function
-* `shouldRetry` - [Function] A predicte function to determine if we want to retry based on the resolve/reject value from asyncFn, for example:
+### Arguments
+* `asyncFunc` - [Function] The original async function.
+* `timeout` - [Function] Execution timeout in milliseconds.
+
+### Return
+* `asyncFuncWithRetry` - [Function] The decorated function with the ability to throw if execution time exceed certain timeout
+
+### Example
 ```javascript
-// example: retry if asyncFn rejects with an error
-// shouldRetry is an error first function, the first argument is the error object
+/*
+ * Example: fetch the resource but throw an error if its execution time is greater than 1000ms
+ */
+import fetch from "node-fetch";
+
+const fetchWithTimeout = withTimeout(fetch, 1000);
+
+fetchWithTimeout("http://localhost:3000/api/v1/users")
+    .then(resp => {
+        console.log("resp:", resp);
+    }).catch(err => {
+        console.error("error:", err);
+    });
+
+```
+
+
+## withRetry(asyncFunc, shouldRetry, retryOptions) => asyncFuncWithRetry
+A high order function to give an async function ability to retry based on certain condition.
+
+### Arguments
+* `asyncFunc` - [Function] The original async function.
+* `shouldRetry` - [Function] A predicte function to determine in which condition `asyncFunc` will retry. 
+```javascript
+// example: retry if asyncFunc rejects with an error
+// shouldRetry is an error first function, the first argument is the rejected reason, and the second arg is the resolved value from asyncFunc
 // will retry if this function return true
 function shouldRetry(err, value) {
     if(err) {
@@ -100,12 +130,15 @@ function shouldRetry(err, value) {
 * `retryOptions` - [Object] 
   * limit - [Number] Retry limit, how many times should it retry based on the predicate. Default: 10.
   * timeout - [Number] Retry timeout in ms, specify 0 to disable timeout. Default: 100ms.
-* `funcWithRetry` - [Function] The decorated function with the ability to auto retry based on predicate, note this function will return a promise
 
-Example:
+### Return Value
+* `asyncFuncWithRetry` - [Function] The decorated function with the ability to auto retry based on predicate, note this function will return a promise
+
+### Example:
+Give `fetch` the ability to retry if it reject with `ECONNREFUSED` error
+
 ```javascript
 import fetch from "node-fetch";
-import withRetry from "../src/withRetry";
 
 const predicate = (err) => {
     console.warn("fail to fetch:", err.name, err.message);
